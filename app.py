@@ -1,198 +1,216 @@
 import streamlit as st
 import pymupdf
 from PIL import Image
+import numpy as np
+import cv2
 import io
 
-# 1. Page Configuration & Custom CSS Styling
-st.set_page_config(
-    page_title="Doc & Image Hub", 
-    page_icon="🚀", 
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+st.set_page_config(page_title="Advanced Doc & CV Studio", page_icon="🚀", layout="wide")
 
 st.markdown("""
     <style>
-    .main-header {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #FF4B4B;
-        margin-bottom: 0px;
-    }
-    .sub-header {
-        font-size: 1.1rem;
-        color: #6c757d;
-        margin-bottom: 30px;
-    }
-    .card {
-        background-color: #1e1e1e;
-        padding: 20px;
-        border-radius: 10px;
-        border: 1px solid #333;
-        margin-bottom: 20px;
-    }
+    .main-header { font-size: 2.3rem; font-weight: 700; color: #FF4B4B; }
+    .sub-header { font-size: 1.05rem; color: #888; margin-bottom: 25px; }
+    .card { background-color: #1e1e1e; padding: 18px; border-radius: 10px; border: 1px solid #333; margin-bottom: 20px; }
     </style>
 """, unsafe_allow_html=True)
 
-# 2. Sidebar Navigation with Styling
-st.sidebar.markdown("### 🎛️ Navigation Hub")
-tool_category = st.sidebar.radio("Select Toolset", ["📄 PDF Studio", "🖼️ Image Studio"])
+# Sidebar Navigation
+st.sidebar.markdown("### 🎛️ Studio Navigation")
+tool_category = st.sidebar.radio("Select Module", ["📄 PDF Advanced Hub", "🖼️ Image Compression & Resize", "👁️ Computer Vision & Enhancement"])
 
-st.sidebar.markdown("---")
-st.sidebar.info("💡 **Tip:** Upload your file first, choose an operation, and click run to process instantly!")
+# Helper function to convert PIL to OpenCV format
+def pil_to_cv2(pil_img):
+    numpy_image = np.array(pil_img)
+    if len(numpy_image.shape) == 2:
+        return numpy_image
+    return cv2.cvtColor(numpy_image, cv2.COLOR_RGB2BGR)
 
-# ==================== PDF STUDIO ====================
-if tool_category == "📄 PDF Studio":
-    st.markdown('<p class="main-header">📄 Advanced PDF Studio</p>', unsafe_allow_html=True)
-    st.markdown('<p class="sub-header">Convert, extract text, and pull assets out of your documents instantly.</p>', unsafe_allow_html=True)
+# Helper function to convert OpenCV to PIL format
+def cv2_to_pil(cv2_img):
+    if len(cv2_img.shape) == 2:
+        return Image.fromarray(cv2_img)
+    return Image.fromarray(cv2.cvtColor(cv2_img, cv2.COLOR_BGR2RGB))
+
+# ==================== 1. PDF ADVANCED HUB ====================
+if tool_category == "📄 PDF Advanced Hub":
+    st.markdown('<p class="main-header">📄 PDF Advanced Hub</p>', unsafe_allow_html=True)
+    st.markdown('<p class="sub-header">Convert, extract elements, and compress heavy PDF files.</p>', unsafe_allow_html=True)
     
     col1, col2 = st.columns([1, 2])
-    
     with col1:
-        st.markdown("### 📤 Upload PDF")
-        uploaded_pdf = st.file_uploader("Choose a PDF file", type=["pdf"], key="pdf_up")
+        uploaded_pdf = st.file_uploader("Upload PDF file", type=["pdf"], key="pdf_hub")
+        pdf_op = st.selectbox("Operation", ["Convert to Markdown", "Extract Text", "Extract Images", "Compress PDF File"])
         
-        pdf_operation = st.selectbox(
-            "🛠️ Choose Operation", 
-            ["Convert to Markdown", "Extract All Text", "Extract Embedded Images"]
-        )
-
     with col2:
         if uploaded_pdf is not None:
-            doc = pymupdf.open(stream=uploaded_pdf.read(), filetype="pdf")
+            pdf_bytes = uploaded_pdf.read()
+            doc = pymupdf.open(stream=pdf_bytes, filetype="pdf")
+            st.markdown(f'<div class="card"><h4>📊 PDF Info</h4><p><b>Pages:</b> {len(doc)}</p><p><b>Size:</b> {len(pdf_bytes)/1024:.1f} KB</p></div>', unsafe_allow_html=True)
             
-            st.markdown(f"""
-                <div class="card">
-                    <h4>📊 File Summary</h4>
-                    <p><b>Filename:</b> {uploaded_pdf.name}</p>
-                    <p><b>Total Pages:</b> {len(doc)}</p>
-                </div>
-            """, unsafe_allow_html=True)
-            
-            if pdf_operation == "Convert to Markdown":
-                if st.button("🚀 Run Markdown Conversion", type="primary"):
-                    with st.spinner("Converting document structure..."):
-                        markdown_content = []
-                        for i, page in enumerate(doc):
-                            markdown_content.append(f"## Page {i + 1}\n{page.get_text('text')}\n\n---\n")
-                        final_md = "".join(markdown_content)
+            if pdf_op == "Convert to Markdown":
+                if st.button("Run Conversion", type="primary"):
+                    md = []
+                    for i, page in enumerate(doc):
+                        md.append(f"## Page {i + 1}\n{page.get_text('text')}\n\n---\n")
+                    final_md = "".join(md)
+                    st.text_area("Markdown Output", final_md, height=300)
+                    st.download_button("Download .md", final_md, file_name="converted.md", mime="text/markdown")
                     
-                    st.success("Conversion completed successfully!")
-                    st.text_area("📝 Markdown Output Preview", final_md, height=250)
-                    st.download_button("📥 Download .md File", final_md, file_name="converted_document.md", mime="text/markdown")
+            elif pdf_op == "Extract Text":
+                if st.button("Extract Text", type="primary"):
+                    text = "".join([page.get_text("text") + "\n" for page in doc])
+                    st.text_area("Plain Text", text, height=300)
+                    st.download_button("Download .txt", text, file_name="extracted.txt", mime="text/plain")
                     
-            elif pdf_operation == "Extract All Text":
-                if st.button("🚀 Extract Plain Text", type="primary"):
-                    with st.spinner("Extracting text layers..."):
-                        all_text = "".join([page.get_text("text") + "\n" for page in doc])
+            elif pdf_op == "Extract Images":
+                if st.button("Extract Embedded Images", type="primary"):
+                    count = 0
+                    for i, page in enumerate(doc):
+                        for img_idx, img in enumerate(page.get_images(full=True)):
+                            base_img = doc.extract_image(img[0])
+                            count += 1
+                            st.image(base_img["image"], caption=f"Page {i+1} Image {img_idx+1}", width=250)
+                            st.download_button(f"Download Image {count}", base_img["image"], file_name=f"p{i+1}_img{img_idx+1}.{base_img['ext']}", key=f"pdf_img_{i}_{img_idx}")
+                    if count == 0: st.info("No embedded raster images found.")
                     
-                    st.success("Extraction completed!")
-                    st.text_area("📝 Text Output Preview", all_text, height=250)
-                    st.download_button("📥 Download .txt File", all_text, file_name="extracted_text.txt", mime="text/plain")
+            elif pdf_op == "Compress PDF File":
+                quality_mode = st.selectbox("Compression Level", ["Standard (Default)", "High Compression (Smaller Size)"])
+                if st.button("Compress PDF", type="primary"):
+                    # Save with garbage collection and defragmentation
+                    output_stream = io.BytesIO()
+                    garbage_val = 4 if quality_mode == "High Compression (Smaller Size)" else 1
+                    doc.save(output_stream, garbage=garbage_val, deflate=True)
+                    compressed_bytes = output_stream.getvalue()
                     
-            elif pdf_operation == "Extract Embedded Images":
-                if st.button("🚀 Scan & Extract Images", type="primary"):
-                    image_count = 0
-                    with st.spinner("Scanning pages for embedded media..."):
-                        for i, page in enumerate(doc):
-                            image_list = page.get_images(full=True)
-                            for img_index, img in enumerate(image_list):
-                                xref = img[0]
-                                base_image = doc.extract_image(xref)
-                                image_bytes = base_image["image"]
-                                image_ext = base_image["ext"]
-                                image_count += 1
-                                
-                                st.image(image_bytes, caption=f"Page {i + 1} - Image {img_index + 1}", width=250)
-                                st.download_button(
-                                    label=f"📥 Download Image {image_count} ({image_ext})",
-                                    data=image_bytes,
-                                    file_name=f"p{i+1}_img_{img_index+1}.{image_ext}",
-                                    mime=f"image/{image_ext}",
-                                    key=f"dl_img_{i}_{img_index}"
-                                )
-                    if image_count == 0:
-                        st.info("No embedded raster images found in this PDF.")
+                    st.success(f"Compressed successfully! New Size: {len(compressed_bytes)/1024:.1f} KB")
+                    st.download_button("Download Compressed PDF", compressed_bytes, file_name="compressed_document.pdf", mime="application/pdf")
         else:
-            st.info("👈 Please upload a PDF file using the left panel to get started.")
+            st.info("👈 Upload a PDF file from the left panel.")
 
-# ==================== IMAGE STUDIO ====================
-elif tool_category == "🖼️ Image Studio":
-    st.markdown('<p class="main-header">🖼️ Advanced Image Studio</p>', unsafe_allow_html=True)
-    st.markdown('<p class="sub-header">Resize, apply grayscale filters, and change image formats seamlessly.</p>', unsafe_allow_html=True)
+# ==================== 2. IMAGE COMPRESSION & RESIZE ====================
+elif tool_category == "🖼️ Image Compression & Resize":
+    st.markdown('<p class="main-header">🖼️ Image Compression & Resize Studio</p>', unsafe_allow_html=True)
+    st.markdown('<p class="sub-header">Resize dimensions and reduce file size effortlessly.</p>', unsafe_allow_html=True)
     
     col1, col2 = st.columns([1, 2])
-    
     with col1:
-        st.markdown("### 📤 Upload Image")
-        uploaded_img = st.file_uploader("Choose an image", type=["png", "jpg", "jpeg", "webp"], key="img_up")
-        
-        img_operation = st.selectbox(
-            "🛠️ Choose Operation", 
-            ["Convert Format (PNG/JPG/WEBP)", "Resize Dimensions", "Apply Grayscale Filter"]
-        )
-
+        uploaded_img = st.file_uploader("Upload Image", type=["png", "jpg", "jpeg", "webp"], key="img_comp")
+        img_task = st.selectbox("Task", ["Resize Image Dimensions", "Compress Image Quality (KB/MB Reduction)"])
     with col2:
         if uploaded_img is not None:
             image = Image.open(uploaded_img)
+            st.image(image, caption="Original Preview", use_container_width=True)
             
-            st.markdown(f"""
-                <div class="card">
-                    <h4>📊 Image Properties</h4>
-                    <p><b>Dimensions:</b> {image.width} x {image.height} px</p>
-                    <p><b>Format:</b> {image.format}</p>
-                    <p><b>Color Mode:</b> {image.mode}</p>
-                </div>
-            """, unsafe_allow_html=True)
-            
-            st.image(image, caption="Original Image Preview", use_container_width=True)
-            
-            if img_operation == "Convert Format (PNG/JPG/WEBP)":
-                target_format = st.selectbox("Select Target Format", ["PNG", "JPEG", "WEBP"])
-                if st.button("🚀 Convert Format", type="primary"):
+            if img_task == "Resize Image Dimensions":
+                w = st.number_input("Width (px)", value=image.width)
+                h = st.number_input("Height (px)", value=image.height)
+                if st.button("Resize Image", type="primary"):
+                    res = image.resize((int(w), int(h)))
+                    st.image(res, caption="Resized Output", use_container_width=True)
                     buf = io.BytesIO()
-                    save_img = image
-                    if target_format == "JPEG" and image.mode in ("RGBA", "P"):
-                        save_img = image.convert("RGB")
+                    res.save(buf, format="JPEG" if image.format=='JPEG' else 'PNG')
+                    st.download_button("Download Resized", buf.getvalue(), file_name="resized_image.jpg")
                     
-                    save_img.save(buf, format=target_format)
-                    byte_im = buf.getvalue()
-                    
-                    st.success(f"Successfully converted to {target_format}!")
-                    st.download_button(
-                        label=f"📥 Download {target_format} Image",
-                        data=byte_im,
-                        file_name=f"converted_image.{target_format.lower()}",
-                        mime=f"image/{target_format.lower()}"
-                    )
-                    
-            elif img_operation == "Resize Dimensions":
-                new_w = st.number_input("New Width (px)", value=image.width)
-                new_h = st.number_input("New Height (px)", value=image.height)
-                if st.button("🚀 Resize Image", type="primary"):
-                    resized_img = image.resize((int(new_w), int(new_h)))
-                    st.image(resized_img, caption="Resized Result", use_container_width=True)
-                    
+            elif img_task == "Compress Image Quality (KB/MB Reduction)":
+                quality = st.slider("JPEG Quality Factor (Lower = Smaller Size)", 10, 95, 75)
+                if st.button("Compress Image", type="primary"):
                     buf = io.BytesIO()
-                    resized_img.save(buf, format=image.format if image.format else "PNG")
-                    st.download_button(
-                        label="📥 Download Resized Image",
-                        data=buf.getvalue(),
-                        file_name=f"resized_image.{image.format.lower() if image.format else 'png'}"
-                    )
-                    
-            elif img_operation == "Apply Grayscale Filter":
-                if st.button("🚀 Apply Filter", type="primary"):
-                    gray_img = image.convert("L")
-                    st.image(gray_img, caption="Grayscale Result", use_container_width=True)
-                    
-                    buf = io.BytesIO()
-                    gray_img.save(buf, format="PNG")
-                    st.download_button(
-                        label="📥 Download Grayscale Image",
-                        data=buf.getvalue(),
-                        file_name="grayscale_image.png",
-                        mime="image/png"
-                    )
+                    rgb_img = image.convert("RGB") if image.mode in ("RGBA", "P") else image
+                    rgb_img.save(buf, format="JPEG", quality=quality)
+                    comp_bytes = buf.getvalue()
+                    st.success(f"Compressed Size: {len(comp_bytes)/1024:.1f} KB")
+                    st.image(comp_bytes, caption="Compressed Preview")
+                    st.download_button("Download Compressed Image", comp_bytes, file_name="compressed_image.jpg", mime="image/jpeg")
         else:
-            st.info("👈 Please upload an image file using the left panel to get started.")
+            st.info("👈 Upload an image file from the left panel.")
+
+# ==================== 3. COMPUTER VISION & ENHANCEMENT ====================
+elif tool_category == "👁️ Computer Vision & Enhancement":
+    st.markdown('<p class="main-header">👁️ Computer Vision & Enhancement Lab</p>', unsafe_allow_html=True)
+    st.markdown('<p class="sub-header">Low-light enhancement, color channels, edge detection, and feature analysis.</p>', unsafe_allow_html=True)
+    
+    col1, col2 = st.columns([1, 2])
+    with col1:
+        cv_file = st.file_uploader("Upload Image for CV", type=["png", "jpg", "jpeg"], key="cv_up")
+        cv_op = st.selectbox("CV Operation", [
+            "Low-Light Enhancement (Retinex / CLAHE)",
+            "Color Space Splitter (RGB / HSV / LAB)",
+            "Canny Edge Detection",
+            "Contour / Object Boundary Detection"
+        ])
+    with col2:
+        if cv_file is not None:
+            pil_img = Image.open(cv_file)
+            cv_img = pil_to_cv2(pil_img)
+            st.image(pil_img, caption="Input Image", use_container_width=True)
+            
+            if cv_op == "Low-Light Enhancement (Retinex / CLAHE)":
+                enh_method = st.radio("Enhancement Algorithm", ["CLAHE (Adaptive Histogram)", "Gamma Correction (Brightening)"])
+                if st.button("Apply Enhancement", type="primary"):
+                    if enh_method == "CLAHE (Adaptive Histogram)":
+                        lab = cv2.cvtColor(cv_img, cv2.COLOR_BGR2LAB)
+                        l, a, b = cv2.split(lab)
+                        clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8,8))
+                        cl = clahe.apply(l)
+                        merged = cv2.merge((cl, a, b))
+                        out_cv = cv2.cvtColor(merged, cv2.COLOR_LAB2BGR)
+                    else:
+                        gamma = 1.8
+                        invGamma = 1.0 / gamma
+                        table = np.array([((i / 255.0) ** invGamma) * 255 for i in range(256)]).astype("uint8")
+                        out_cv = cv2.LUT(cv_img, table)
+                        
+                    out_pil = cv2_to_pil(out_cv)
+                    st.image(out_pil, caption="Enhanced Output", use_container_width=True)
+                    buf = io.BytesIO()
+                    out_pil.save(buf, format="PNG")
+                    st.download_button("Download Enhanced Image", buf.getvalue(), file_name="enhanced_image.png")
+                    
+            elif cv_op == "Color Space Splitter (RGB / HSV / LAB)":
+                space = st.selectbox("Color Space", ["RGB", "HSV", "LAB"])
+                if st.button("Split Channels", type="primary"):
+                    if space == "RGB":
+                        rgb = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
+                        c1, c2, c3 = cv2.split(rgb)
+                        names = ["Red Channel", "Green Channel", "Blue Channel"]
+                    elif space == "HSV":
+                        hsv = cv2.cvtColor(cv_img, cv2.COLOR_BGR2HSV)
+                        c1, c2, c3 = cv2.split(hsv)
+                        names = ["Hue (H)", "Saturation (S)", "Value (V)"]
+                    else:
+                        lab_space = cv2.cvtColor(cv_img, cv2.COLOR_BGR2LAB)
+                        c1, c2, c3 = cv2.split(lab_space)
+                        names = ["Lightness (L)", "A-Channel", "B-Channel"]
+                        
+                    col_a, col_b, col_c = st.columns(3)
+                    with col_a: st.image(c1, caption=names[0], use_container_width=True, clamp=True)
+                    with col_b: st.image(c2, caption=names[1], use_container_width=True, clamp=True)
+                    with col_c: st.image(c3, caption=names[2], use_container_width=True, clamp=True)
+                    
+            elif cv_op == "Canny Edge Detection":
+                t1 = st.slider("Threshold 1", 0, 255, 100)
+                t2 = st.slider("Threshold 2", 0, 255, 200)
+                if st.button("Detect Edges", type="primary"):
+                    gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
+                    edges = cv2.Canny(gray, t1, t2)
+                    st.image(edges, caption="Canny Edges", use_container_width=True, clamp=True)
+                    buf = io.BytesIO()
+                    Image.fromarray(edges).save(buf, format="PNG")
+                    st.download_button("Download Edge Mask", buf.getvalue(), file_name="canny_edges.png")
+                    
+            elif cv_op == "Contour / Object Boundary Detection":
+                thresh_val = st.slider("Binary Threshold", 0, 255, 127)
+                if st.button("Find Contours", type="primary"):
+                    gray = cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
+                    _, thresh = cv2.threshold(gray, thresh_val, 255, cv2.THRESH_BINARY)
+                    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+                    
+                    cv_contour = cv_img.copy()
+                    cv2.drawContours(cv_contour, contours, -1, (0, 255, 0), 2)
+                    out_pil = cv2_to_pil(cv_contour)
+                    
+                    st.success(f"Detected {len(contours)} distinct object boundaries/contours!")
+                    st.image(out_pil, caption="Detected Boundaries", use_container_width=True)
+        else:
+            st.info("👈 Upload an image file for computer vision operations.")
