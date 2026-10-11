@@ -9,7 +9,7 @@ from wordcloud import WordCloud
 
 # Page Configuration
 st.set_page_config(
-    page_title="Nexus Intelligence | Enterprise Studio", 
+    page_title="Ashutosh Borah | Enterprise Studio", 
     page_icon="⚡", 
     layout="wide",
     initial_sidebar_state="expanded"
@@ -58,8 +58,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Sidebar Navigation Header
-st.sidebar.markdown("### ⚡ NEXUS STUDIO")
-st.sidebar.markdown("<p style='font-size: 0.85rem; color: #9ca3af;'>Advanced Signal, Vision & Document Toolkit</p>", unsafe_allow_html=True)
+st.sidebar.markdown("### ⚡ ASHUTOSH STUDIO")
+st.sidebar.markdown("<p style='font-size: 0.85rem; color: #9ca3af;'>Created & Managed by <b>Ashutosh Borah</b></p>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
 
 tool_category = st.sidebar.radio(
@@ -80,7 +80,7 @@ def cv2_to_pil(cv2_img):
 # ==================== 1. DOCUMENT INTELLIGENCE ====================
 if tool_category == "📄 Document Intelligence":
     st.markdown('<p class="hero-title">📄 Document Intelligence Suite</p>', unsafe_allow_html=True)
-    st.markdown('<p class="hero-subtitle">High-performance parsing, markdown conversion, and visual word analytics.</p>', unsafe_allow_html=True)
+    st.markdown('<p class="hero-subtitle">Developed by Ashutosh Borah — High-performance parsing, markdown conversion, and visual word analytics.</p>', unsafe_allow_html=True)
     
     col1, col2 = st.columns([1, 2], gap="large")
     with col1:
@@ -253,7 +253,6 @@ elif tool_category == "📊 Signal & Data Analytics":
             </div>
         """, unsafe_allow_html=True)
         
-        # Generate signal
         np.random.seed(42)
         t = np.linspace(0, 1, 1000)
         signal = np.sin(2 * np.pi * freq * t) + noise_level * np.random.normal(size=1000)
@@ -332,3 +331,7 @@ elif tool_category == "🖼️ Media Studio":
                     st.download_button("📥 Download Grayscale Image", buf.getvalue(), file_name="grayscale.png", mime="image/png")
         else:
             st.info("👈 Upload an image asset from the left panel.")
+
+# Footer Watermark
+st.markdown("---")
+st.markdown("<p style='text-align: center; color: #4b5563; font-size: 0.85rem;'>Engineered with Precision by Ashutosh Borah © 2026</p>", unsafe_allow_html=True)
