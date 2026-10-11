@@ -9,7 +9,7 @@ from wordcloud import WordCloud
 
 # Page Configuration
 st.set_page_config(
-    page_title="Shohail | Enterprise Studio", 
+    page_title="ASHUTOSH | Enterprise Studio", 
     page_icon="⚡", 
     layout="wide",
     initial_sidebar_state="expanded"
