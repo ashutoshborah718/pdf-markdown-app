@@ -3,3 +3,5 @@ pymupdf
 Pillow
 opencv-python-headless
 numpy
+matplotlib
+wordcloud
