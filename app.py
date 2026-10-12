@@ -15,7 +15,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ==================== HIGH-CONTRAST DARK MODE CSS ====================
+# ==================== HIGH-CONTRAST VISIBILITY CSS ====================
 st.markdown("""
     <style>
     .stApp {
@@ -52,13 +52,29 @@ st.markdown("""
         border-radius: 8px;
         font-weight: 600;
     }
-    /* Fix tab text visibility in dark mode */
+    
+    /* ==================== CRITICAL TAB VISIBILITY FIX ==================== */
+    /* Style for all tab buttons */
     .stTabs [data-baseweb="tab"] {
-        color: #9ca3af;
-        font-weight: 600;
+        background-color: #111827 !important;
+        border: 1px solid #374151 !important;
+        padding: 10px 16px !important;
+        border-radius: 8px 8px 0px 0px !important;
+        margin-right: 4px !important;
     }
+    /* Unselected tab text color (Bright & Visible) */
+    .stTabs [data-baseweb="tab"] p {
+        color: #e5e7eb !important;
+        font-weight: 600 !important;
+        font-size: 0.9rem !important;
+    }
+    /* Selected/Active tab style */
     .stTabs [data-baseweb="tab"][aria-selected="true"] {
-        color: #60a5fa;
+        background-color: #1f2937 !important;
+        border-bottom: 3px solid #60a5fa !important;
+    }
+    .stTabs [data-baseweb="tab"][aria-selected="true"] p {
+        color: #60a5fa !important;
     }
     </style>
 """, unsafe_allow_html=True)
