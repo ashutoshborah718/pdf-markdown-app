@@ -10,3 +10,4 @@ python-docx
 faster-whisper
 argostranslate
 indic-transliteration
+av>=11,<19
