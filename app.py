@@ -9,13 +9,13 @@ from wordcloud import WordCloud
 
 # Page Configuration
 st.set_page_config(
-    page_title="ASHUTOSH | Enterprise Studio", 
+    page_title="Ashutosh Studio | Multi-Page Enterprise Suite", 
     page_icon="⚡", 
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Professional CSS Styling & Modern UI Framework
+# Professional CSS Styling & App-Like Theme
 st.markdown("""
     <style>
     /* Main Background & Theme */
@@ -24,9 +24,9 @@ st.markdown("""
         color: #f3f4f6;
     }
     
-    /* Custom Headers */
+    /* Hero Headers */
     .hero-title {
-        font-size: 2.5rem;
+        font-size: 2.3rem;
         font-weight: 800;
         background: linear-gradient(90deg, #60a5fa, #c084fc);
         -webkit-background-clip: text;
@@ -34,22 +34,22 @@ st.markdown("""
         margin-bottom: 0px;
     }
     .hero-subtitle {
-        font-size: 1.05rem;
+        font-size: 1rem;
         color: #9ca3af;
         margin-bottom: 25px;
     }
     
-    /* Glassmorphism Cards */
-    .metric-card {
-        background: rgba(17, 24, 39, 0.7);
+    /* App Card Containers */
+    .app-card {
+        background: rgba(17, 24, 39, 0.75);
         border: 1px solid rgba(75, 85, 99, 0.4);
         padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border-radius: 14px;
+        box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.2);
         margin-bottom: 20px;
     }
     
-    /* Sidebar Styling */
+    /* Sidebar Navigation Customization */
     section[data-testid="stSidebar"] {
         background-color: #111827;
         border-right: 1px solid #1f2937;
@@ -57,17 +57,27 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Sidebar Navigation Header
+# ==================== MULTI-PAGE ROUTER ====================
 st.sidebar.markdown("### ⚡ ASHUTOSH STUDIO")
-st.sidebar.markdown("<p style='font-size: 0.85rem; color: #9ca3af;'>Created & Managed by <b>Ashutosh Borah</b></p>", unsafe_allow_html=True)
+st.sidebar.markdown("<p style='font-size: 0.85rem; color: #9ca3af;'>Multi-Page Enterprise Hub<br>Architect: <b>Ashutosh Borah</b></p>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
 
-tool_category = st.sidebar.radio(
-    "Select Enterprise Module", 
-    ["📄 Document Intelligence", "👁️ Computer Vision & CV", "📊 Signal & Data Analytics", "🖼️ Media Studio"]
+# Page Selector (Acts like separate app pages)
+selected_page = st.sidebar.radio(
+    "🧭 Navigation Directory", 
+    [
+        "🏠 Home & Overview", 
+        "📄 Document Intelligence Hub", 
+        "👁️ Computer Vision & Lab", 
+        "📊 Signal & FFT Analytics", 
+        "🖼️ Media & Image Studio"
+    ]
 )
 
-# Helper conversion utilities
+st.sidebar.markdown("---")
+st.sidebar.info("💡 **System Status:** All micro-services online & operational.")
+
+# Helper utilities
 def pil_to_cv2(pil_img):
     arr = np.array(pil_img)
     if len(arr.shape) == 2: return arr
@@ -77,91 +87,160 @@ def cv2_to_pil(cv2_img):
     if len(cv2_img.shape) == 2: return Image.fromarray(cv2_img)
     return Image.fromarray(cv2.cvtColor(cv2_img, cv2.COLOR_BGR2RGB))
 
-# ==================== 1. DOCUMENT INTELLIGENCE ====================
-if tool_category == "📄 Document Intelligence":
+
+# ==================== PAGE 0: HOME & OVERVIEW ====================
+if selected_page == "🏠 Home & Overview":
+    st.markdown('<p class="hero-title">Welcome to Ashutosh Studio 🚀</p>', unsafe_allow_html=True)
+    st.markdown('<p class="hero-subtitle">An enterprise-grade, multi-functional computational platform designed for advanced document processing, computer vision, and signal analytics.</p>', unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.markdown("""
+            <div class="app-card">
+                <h3>📄 Document Suite</h3>
+                <p style="color: #9ca3af; font-size: 0.9rem;">Convert, extract text, generate visual word clouds, compress PDFs, and merge multi-file document queues seamlessly.</p>
+            </div>
+        """, unsafe_allow_html=True)
+        
+    with col2:
+        st.markdown("""
+            <div class="app-card">
+                <h3>👁️ Computer Vision</h3>
+                <p style="color: #9ca3af; font-size: 0.9rem;">Apply low-light Retinex/CLAHE enhancement, perform multi-channel space splitting, edge mapping, and Otsu contour segmentation.</p>
+            </div>
+        """, unsafe_allow_html=True)
+        
+    with col3:
+        st.markdown("""
+            <div class="app-card">
+                <h3>📊 Signal & Media</h3>
+                <p style="color: #9ca3af; font-size: 0.9rem;">Simulate time-domain waveforms, execute Fast Fourier Transform (FFT) frequency analysis, and batch-optimize image resolutions.</p>
+            </div>
+        """, unsafe_allow_html=True)
+        
+    st.markdown("### 🌐 Quick Launch Directory")
+    st.info("👈 Use the **Navigation Directory** in the sidebar to switch between dedicated application pages and unlock different tool suites instantly.")
+
+
+# ==================== PAGE 1: DOCUMENT INTELLIGENCE ====================
+elif selected_page == "📄 Document Intelligence Hub":
     st.markdown('<p class="hero-title">📄 Document Intelligence Suite</p>', unsafe_allow_html=True)
-    st.markdown('<p class="hero-subtitle">Developed by Ashutosh Borah — High-performance parsing, markdown conversion, and visual word analytics.</p>', unsafe_allow_html=True)
+    st.markdown('<p class="hero-subtitle">High-performance parsing, markdown conversion, PDF compression, merging, and text analytics.</p>', unsafe_allow_html=True)
     
     col1, col2 = st.columns([1, 2], gap="large")
     with col1:
-        st.markdown("### 📥 Source Ingestion")
-        uploaded_pdf = st.file_uploader("Upload PDF Document", type=["pdf"], key="doc_up")
-        doc_task = st.selectbox("Pipeline Operation", [
+        st.markdown("### ⚙️ Pipeline Controls")
+        doc_task = st.selectbox("Select Tool Mode", [
             "Convert to Clean Markdown", 
             "Extract & Generate Word Cloud", 
             "Compress PDF Footprint",
-            "Extract Embedded Assets"
+            "Extract Embedded Assets",
+            "Merge Multiple PDFs"
         ])
         
     with col2:
-        if uploaded_pdf is not None:
-            pdf_bytes = uploaded_pdf.read()
-            doc = pymupdf.open(stream=pdf_bytes, filetype="pdf")
+        if doc_task == "Merge Multiple PDFs":
+            st.markdown("### 🔗 PDF Merger Module")
+            uploaded_files = st.file_uploader("Upload PDF Files to Merge (In Sequence)", type=["pdf"], accept_multiple_files=True, key="merge_files")
             
-            st.markdown(f"""
-                <div class="metric-card">
-                    <h4>📊 Metadata Inspection</h4>
-                    <p><b>Filename:</b> {uploaded_pdf.name}</p>
-                    <p><b>Page Count:</b> {len(doc)}</p>
-                    <p><b>Payload Size:</b> {len(pdf_bytes)/1024:.2f} KB</p>
-                </div>
-            """, unsafe_allow_html=True)
-            
-            if doc_task == "Convert to Clean Markdown":
-                if st.button("🚀 Initialize Conversion Pipeline", type="primary"):
-                    with st.spinner("Processing document layout..."):
-                        md = [f"## Page {i+1}\n{page.get_text('text')}\n\n---\n" for i, page in enumerate(doc)]
-                        final_md = "".join(md)
-                    st.success("Conversion successful!")
-                    st.text_area("Markdown Stream Output", final_md, height=280)
-                    st.download_button("📥 Download Markdown File", final_md, file_name="document.md", mime="text/markdown")
-                    
-            elif doc_task == "Extract & Generate Word Cloud":
-                if st.button("🚀 Generate Corpus Word Cloud", type="primary"):
-                    with st.spinner("Aggregating text and rendering word cloud..."):
-                        full_corpus = " ".join([page.get_text("text") for page in doc])
-                        wc = WordCloud(width=900, height=450, background_color="#0b0f19", colormap="cool").generate(full_corpus)
+            if uploaded_files:
+                st.markdown(f"""
+                    <div class="app-card">
+                        <h4>📊 Merge Queue Status</h4>
+                        <p><b>Files Loaded:</b> {len(uploaded_files)}</p>
+                    </div>
+                """, unsafe_allow_html=True)
+                
+                if len(uploaded_files) > 1:
+                    if st.button("🚀 Execute Document Merge", type="primary"):
+                        with st.spinner("Merging document streams..."):
+                            merged_doc = pymupdf.open()
+                            for f in uploaded_files:
+                                with pymupdf.open(stream=f.read(), filetype="pdf") as temp_doc:
+                                    merged_doc.insert_pdf(temp_doc)
+                            out_stream = io.BytesIO()
+                            merged_doc.save(out_stream)
+                            merged_bytes = out_stream.getvalue()
                         
-                        fig, ax = plt.subplots(figsize=(10, 5))
-                        ax.imshow(wc, interpolation="bilinear")
-                        ax.axis("off")
-                        fig.patch.set_facecolor('#0b0f19')
-                        st.pyplot(fig)
-                        
-            elif doc_task == "Compress PDF Footprint":
-                comp_level = st.selectbox("Compression Strategy", ["Standard Deflate", "Aggressive Garbage Collection"])
-                if st.button("🚀 Execute Compression", type="primary"):
-                    out = io.BytesIO()
-                    g_val = 4 if "Aggressive" in comp_level else 1
-                    doc.save(out, garbage=g_val, deflate=True)
-                    res_bytes = out.getvalue()
-                    
-                    st.success(f"Optimized! New Size: {len(res_bytes)/1024:.2f} KB (Saved {(1 - len(res_bytes)/len(pdf_bytes))*100:.1f}%)")
-                    st.download_button("📥 Download Optimized PDF", res_bytes, file_name="optimized.pdf", mime="application/pdf")
-                    
-            elif doc_task == "Extract Embedded Assets":
-                if st.button("🚀 Scan & Extract Media", type="primary"):
-                    counter = 0
-                    for i, page in enumerate(doc):
-                        for idx, img in enumerate(page.get_images(full=True)):
-                            extracted = doc.extract_image(img[0])
-                            counter += 1
-                            st.image(extracted["image"], caption=f"Page {i+1} Asset {idx+1}", width=220)
-                            st.download_button(f"📥 Download Asset {counter}", extracted["image"], file_name=f"p{i+1}_asset{idx+1}.{extracted['ext']}", key=f"asset_{i}_{idx}")
-                    if counter == 0: st.info("No raster image assets embedded in document stream.")
+                        st.success(f"Successfully merged {len(uploaded_files)} documents!")
+                        st.download_button("📥 Download Merged PDF", merged_bytes, file_name="merged_document.pdf", mime="application/pdf")
+                else:
+                    st.info("Please upload at least 2 PDF files to execute merging.")
+            else:
+                st.info("👈 Upload multiple PDF files using the uploader above.")
+                
         else:
-            st.info("👈 Upload a PDF document via the control panel to initialize workflow.")
+            uploaded_pdf = st.file_uploader("Upload Target PDF", type=["pdf"], key="doc_up")
+            if uploaded_pdf is not None:
+                pdf_bytes = uploaded_pdf.read()
+                doc = pymupdf.open(stream=pdf_bytes, filetype="pdf")
+                
+                st.markdown(f"""
+                    <div class="app-card">
+                        <h4>📊 Metadata Inspection</h4>
+                        <p><b>Filename:</b> {uploaded_pdf.name}</p>
+                        <p><b>Page Count:</b> {len(doc)}</p>
+                        <p><b>Payload Size:</b> {len(pdf_bytes)/1024:.2f} KB</p>
+                    </div>
+                """, unsafe_allow_html=True)
+                
+                if doc_task == "Convert to Clean Markdown":
+                    if st.button("🚀 Run Markdown Conversion", type="primary"):
+                        with st.spinner("Parsing layout structure..."):
+                            md = [f"## Page {i+1}\n{page.get_text('text')}\n\n---\n" for i, page in enumerate(doc)]
+                            final_md = "".join(md)
+                        st.success("Conversion successful!")
+                        st.text_area("Markdown Output Stream", final_md, height=280)
+                        st.download_button("📥 Download Markdown", final_md, file_name="document.md", mime="text/markdown")
+                        
+                elif doc_task == "Extract & Generate Word Cloud":
+                    if st.button("🚀 Generate Word Cloud", type="primary"):
+                        with st.spinner("Analyzing text corpus..."):
+                            full_corpus = " ".join([page.get_text("text") for page in doc])
+                            wc = WordCloud(width=900, height=450, background_color="#0b0f19", colormap="cool").generate(full_corpus)
+                            
+                            fig, ax = plt.subplots(figsize=(10, 5))
+                            ax.imshow(wc, interpolation="bilinear")
+                            ax.axis("off")
+                            fig.patch.set_facecolor('#0b0f19')
+                            st.pyplot(fig)
+                            
+                elif doc_task == "Compress PDF Footprint":
+                    comp_level = st.selectbox("Compression Strategy", ["Standard Deflate", "Aggressive Garbage Collection"])
+                    if st.button("🚀 Compress PDF", type="primary"):
+                        out = io.BytesIO()
+                        g_val = 4 if "Aggressive" in comp_level else 1
+                        doc.save(out, garbage=g_val, deflate=True)
+                        res_bytes = out.getvalue()
+                        
+                        st.success(f"Optimized! New Size: {len(res_bytes)/1024:.2f} KB (Saved {(1 - len(res_bytes)/len(pdf_bytes))*100:.1f}%)")
+                        st.download_button("📥 Download Optimized PDF", res_bytes, file_name="optimized.pdf", mime="application/pdf")
+                        
+                elif doc_task == "Extract Embedded Assets":
+                    if st.button("🚀 Scan & Extract Media", type="primary"):
+                        counter = 0
+                        for i, page in enumerate(doc):
+                            for idx, img in enumerate(page.get_images(full=True)):
+                                extracted = doc.extract_image(img[0])
+                                counter += 1
+                                st.image(extracted["image"], caption=f"Page {i+1} Asset {idx+1}", width=220)
+                                st.download_button(f"📥 Download Asset {counter}", extracted["image"], file_name=f"p{i+1}_asset{idx+1}.{extracted['ext']}", key=f"asset_{i}_{idx}")
+                        if counter == 0: st.info("No raster image assets found in document stream.")
+            else:
+                st.info("👈 Upload a PDF document from the control panel.")
 
-# ==================== 2. COMPUTER VISION & CV ====================
-elif tool_category == "👁️ Computer Vision & CV":
-    st.markdown('<p class="hero-title">👁️ Computer Vision Studio</p>', unsafe_allow_html=True)
-    st.markdown('<p class="hero-subtitle">Advanced low-light enhancement, structural edge mapping, and Otsu thresholding.</p>', unsafe_allow_html=True)
+
+# ==================== PAGE 2: COMPUTER VISION ====================
+elif selected_page == "👁️ Computer Vision & Lab":
+    st.markdown('<p class="hero-title">👁️ Computer Vision Laboratory</p>', unsafe_allow_html=True)
+    st.markdown('<p class="hero-subtitle">Advanced low-light image enhancement, multi-channel color splitting, edge detection, and Otsu segmentation.</p>', unsafe_allow_html=True)
     
     col1, col2 = st.columns([1, 2], gap="large")
     with col1:
-        st.markdown("### 📥 Frame Ingestion")
+        st.markdown("### ⚙️ Vision Controls")
         cv_upload = st.file_uploader("Upload Image Target", type=["png", "jpg", "jpeg"], key="cv_file")
-        cv_pipeline = st.selectbox("Vision Algorithm", [
+        cv_pipeline = st.selectbox("Algorithm Pipeline", [
             "Low-Light Retinex/CLAHE Enhancement",
             "Multi-Channel Space Splitter (RGB/HSV/LAB)",
             "Canny Structural Edge Detector",
@@ -174,7 +253,7 @@ elif tool_category == "👁️ Computer Vision & CV":
             st.image(pil_i, caption="Raw Input Feed", use_container_width=True)
             
             if cv_pipeline == "Low-Light Retinex/CLAHE Enhancement":
-                if st.button("🚀 Run Enhancement Algorithm", type="primary"):
+                if st.button("🚀 Run Enhancement Pipeline", type="primary"):
                     lab = cv2.cvtColor(cv_i, cv2.COLOR_BGR2LAB)
                     l, a, b = cv2.split(lab)
                     clahe = cv2.createCLAHE(clipLimit=3.5, tileGridSize=(8,8))
@@ -233,23 +312,24 @@ elif tool_category == "👁️ Computer Vision & CV":
         else:
             st.info("👈 Upload an image file for computer vision processing.")
 
-# ==================== 3. SIGNAL & DATA ANALYTICS ====================
-elif tool_category == "📊 Signal & Data Analytics":
-    st.markdown('<p class="hero-title">📊 Signal & Data Spectrum Analyzer</p>', unsafe_allow_html=True)
-    st.markdown('<p class="hero-subtitle">Generate synthetic signal waveforms or run Fast Fourier Transform (FFT) frequency analysis.</p>', unsafe_allow_html=True)
+
+# ==================== PAGE 3: SIGNAL ANALYTICS ====================
+elif selected_page == "📊 Signal & FFT Analytics":
+    st.markdown('<p class="hero-title">📊 Signal & Frequency Spectrum Analyzer</p>', unsafe_allow_html=True)
+    st.markdown('<p class="hero-subtitle">Simulate synthetic signal waveforms and compute Fast Fourier Transform (FFT) power spectral densities.</p>', unsafe_allow_html=True)
     
     col1, col2 = st.columns([1, 2], gap="large")
     with col1:
-        st.markdown("### ⚙️ Signal Parameters")
+        st.markdown("### ⚙️ Parameter Configuration")
         freq = st.slider("Signal Frequency (Hz)", 1, 50, 5)
         noise_level = st.slider("Additive Noise Factor", 0.0, 1.0, 0.2)
         analysis_type = st.selectbox("Analysis Mode", ["Time-Domain Waveform", "Frequency Spectrum (FFT Power Density)"])
     with col2:
         st.markdown(f"""
-            <div class="metric-card">
-                <h4>📈 Simulation Status</h4>
+            <div class="app-card">
+                <h4>📈 Simulation Engine</h4>
                 <p><b>Sampling Rate:</b> 1000 Hz</p>
-                <p><b>Configuration:</b> Sine Wave + Gaussian Noise</p>
+                <p><b>Signal Model:</b> Sinusoid + Gaussian Noise</p>
             </div>
         """, unsafe_allow_html=True)
         
@@ -278,21 +358,22 @@ elif tool_category == "📊 Signal & Data Analytics":
         for spine in ax.spines.values(): spine.set_edgecolor("#374151")
         st.pyplot(fig)
 
-# ==================== 4. MEDIA STUDIO ====================
-elif tool_category == "🖼️ Media Studio":
-    st.markdown('<p class="hero-title">🖼️ Media Compression & Format Studio</p>', unsafe_allow_html=True)
-    st.markdown('<p class="hero-subtitle">Batch resize dimensions, adjust quality compression ratios, and apply filters.</p>', unsafe_allow_html=True)
+
+# ==================== PAGE 4: MEDIA STUDIO ====================
+elif selected_page == "🖼️ Media & Image Studio":
+    st.markdown('<p class="hero-title">🖼️ Media & Image Compression Studio</p>', unsafe_allow_html=True)
+    st.markdown('<p class="hero-subtitle">Batch resize dimensions, adjust quality compression ratios, and apply image filters.</p>', unsafe_allow_html=True)
     
     col1, col2 = st.columns([1, 2], gap="large")
     with col1:
-        st.markdown("### 📥 Media Ingestion")
+        st.markdown("### ⚙️ Asset Controls")
         media_file = st.file_uploader("Upload Image Asset", type=["png", "jpg", "jpeg", "webp"], key="media_up")
         media_op = st.selectbox("Operation Mode", ["Resize Dimensions", "Quality Compression (KB Reduction)", "Grayscale Conversion"])
     with col2:
         if media_file is not None:
             img = Image.open(media_file)
             st.markdown(f"""
-                <div class="metric-card">
+                <div class="app-card">
                     <h4>📊 Asset Specifications</h4>
                     <p><b>Resolution:</b> {img.width} x {img.height} px</p>
                     <p><b>Format:</b> {img.format}</p>
@@ -330,7 +411,7 @@ elif tool_category == "🖼️ Media Studio":
                     gray.save(buf, format="PNG")
                     st.download_button("📥 Download Grayscale Image", buf.getvalue(), file_name="grayscale.png", mime="image/png")
         else:
-            st.info("👈 Upload an image asset from the left panel.")
+            st.info("👈 Upload an image asset from the control panel.")
 
 # Footer Watermark
 st.markdown("---")
