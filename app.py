@@ -99,7 +99,7 @@ if selected_page == "🏠 Home & Overview":
         st.markdown("""
             <div class="app-card">
                 <h3>📄 Document Suite</h3>
-                <p style="color: #9ca3af; font-size: 0.9rem;">Convert, extract text, generate visual word clouds, compress PDFs, and merge multi-file document queues seamlessly.</p>
+                <p style="color: #9ca3af; font-size: 0.9rem;">Convert, extract text, generate visual word clouds, compress PDFs, merge multi-file document queues, and compile images into PDFs.</p>
             </div>
         """, unsafe_allow_html=True)
         
@@ -126,7 +126,7 @@ if selected_page == "🏠 Home & Overview":
 # ==================== PAGE 1: DOCUMENT INTELLIGENCE ====================
 elif selected_page == "📄 Document Intelligence Hub":
     st.markdown('<p class="hero-title">📄 Document Intelligence Suite</p>', unsafe_allow_html=True)
-    st.markdown('<p class="hero-subtitle">High-performance parsing, markdown conversion, PDF compression, merging, and text analytics.</p>', unsafe_allow_html=True)
+    st.markdown('<p class="hero-subtitle">High-performance parsing, markdown conversion, PDF compression, merging, image-to-PDF compilation, and text analytics.</p>', unsafe_allow_html=True)
     
     col1, col2 = st.columns([1, 2], gap="large")
     with col1:
@@ -136,7 +136,8 @@ elif selected_page == "📄 Document Intelligence Hub":
             "Extract & Generate Word Cloud", 
             "Compress PDF Footprint",
             "Extract Embedded Assets",
-            "Merge Multiple PDFs"
+            "Merge Multiple PDFs",
+            "Convert Images to PDF"
         ])
         
     with col2:
@@ -169,6 +170,53 @@ elif selected_page == "📄 Document Intelligence Hub":
                     st.info("Please upload at least 2 PDF files to execute merging.")
             else:
                 st.info("👈 Upload multiple PDF files using the uploader above.")
+                
+        elif doc_task == "Convert Images to PDF":
+            st.markdown("### 🖼️📄 Image to PDF Compiler")
+            img_files = st.file_uploader("Upload Images (PNG, JPG, JPEG)", type=["png", "jpg", "jpeg"], accept_multiple_files=True, key="img_to_pdf_up")
+            
+            if img_files:
+                st.markdown(f"""
+                    <div class="app-card">
+                        <h4>📊 Compilation Queue</h4>
+                        <p><b>Images Loaded:</b> {len(img_files)}</p>
+                    </div>
+                """, unsafe_allow_html=True)
+                
+                # Preview uploaded images
+                cols = st.columns(min(len(img_files), 3))
+                for idx, im_file in enumerate(img_files):
+                    with cols[idx % len(cols)]:
+                        st.image(im_file, caption=f"Img {idx+1}", use_container_width=True)
+                
+                if st.button("🚀 Compile Images to PDF", type="primary"):
+                    with st.spinner("Compiling images into document payload..."):
+                        image_list = []
+                        for im_file in img_files:
+                            pil_img = Image.open(im_file)
+                            if pil_img.mode in ("RGBA", "P"):
+                                pil_img = pil_img.convert("RGB")
+                            image_list.append(pil_img)
+                        
+                        # Save first image and append the rest
+                        pdf_buffer = io.BytesIO()
+                        image_list[0].save(
+                            pdf_buffer, 
+                            format="PDF", 
+                            save_all=True, 
+                            append_images=image_list[1:]
+                        )
+                        pdf_data = pdf_buffer.getvalue()
+                    
+                    st.success("Successfully compiled images into PDF!")
+                    st.download_button(
+                        "📥 Download Compiled PDF", 
+                        pdf_data, 
+                        file_name="images_compiled.pdf", 
+                        mime="application/pdf"
+                    )
+            else:
+                st.info("👈 Upload one or more images using the uploader above to compile them into a PDF.")
                 
         else:
             uploaded_pdf = st.file_uploader("Upload Target PDF", type=["pdf"], key="doc_up")
@@ -411,7 +459,7 @@ elif selected_page == "🖼️ Media & Image Studio":
                     gray.save(buf, format="PNG")
                     st.download_button("📥 Download Grayscale Image", buf.getvalue(), file_name="grayscale.png", mime="image/png")
         else:
-            st.info("👈 Upload an image asset from the control panel.")
+            st.info("👈 Upload an image asset from the left panel.")
 
 # Footer Watermark
 st.markdown("---")
