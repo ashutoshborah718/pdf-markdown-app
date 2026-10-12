@@ -15,16 +15,16 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ==================== CLEAN PROFESSIONAL CSS ====================
+# ==================== HIGH-CONTRAST DARK MODE CSS ====================
 st.markdown("""
     <style>
     .stApp {
-        background-color: #090d16;
+        background-color: #0b0f19;
         color: #f3f4f6;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
     .hero-title {
-        font-size: 2rem;
+        font-size: 2.2rem;
         font-weight: 800;
         letter-spacing: -0.025em;
         background: linear-gradient(135deg, #60a5fa 0%, #a855f7 100%);
@@ -33,17 +33,32 @@ st.markdown("""
         margin-bottom: 0px;
     }
     .hero-subtitle {
-        font-size: 0.9rem;
+        font-size: 0.95rem;
         color: #9ca3af;
+        margin-bottom: 25px;
+    }
+    .overview-card {
+        background: #111827;
+        border: 1px solid #374151;
+        padding: 24px;
+        border-radius: 14px;
         margin-bottom: 20px;
     }
     section[data-testid="stSidebar"] {
         background-color: #0e1322;
-        border-right: 1px solid rgba(255, 255, 255, 0.05);
+        border-right: 1px solid #1f2937;
     }
     .stButton button {
         border-radius: 8px;
         font-weight: 600;
+    }
+    /* Fix tab text visibility in dark mode */
+    .stTabs [data-baseweb="tab"] {
+        color: #9ca3af;
+        font-weight: 600;
+    }
+    .stTabs [data-baseweb="tab"][aria-selected="true"] {
+        color: #60a5fa;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -56,8 +71,8 @@ st.sidebar.markdown("### ⚡ ASHUTOSH STUDIO")
 st.sidebar.markdown("<p style='font-size: 0.8rem; color: #9ca3af; line-height: 1.4;'>Enterprise Computational Hub<br>Architect: <b>Ashutosh Borah</b></p>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
 
-st.sidebar.markdown("#### 🧭 Workspace")
-if st.sidebar.button("🏠 Overview", use_container_width=True):
+st.sidebar.markdown("#### 🧭 Workspace Directory")
+if st.sidebar.button("🏠 Platform Overview", use_container_width=True):
     st.session_state.active_page = "🏠 Platform Overview"
 if st.sidebar.button("📄 Document Intelligence", use_container_width=True):
     st.session_state.active_page = "📄 Document Intelligence"
@@ -71,29 +86,32 @@ selected_page = st.session_state.active_page
 
 # ==================== 0. OVERVIEW PAGE ====================
 if selected_page == "🏠 Platform Overview":
-    st.markdown('<p class="hero-title">Ashutosh Studio Workspace</p>', unsafe_allow_html=True)
-    st.markdown('<p class="hero-subtitle">Select a tool suite below to begin processing documents or media assets.</p>', unsafe_allow_html=True)
+    st.markdown('<p class="hero-title">Welcome to Ashutosh Studio</p>', unsafe_allow_html=True)
+    st.markdown('<p class="hero-subtitle">An enterprise-grade computational platform for advanced document operations and media optimization.</p>', unsafe_allow_html=True)
     
-    col1, col2 = st.columns(2, gap="medium")
+    col1, col2 = st.columns(2, gap="large")
     with col1:
-        st.markdown("### 📄 Document Intelligence")
-        st.markdown("Convert formats, merge files, compile images, generate word clouds, and optimize PDF footprints.")
-        if st.button("Open Document Suite ➔", type="primary", use_container_width=True):
-            st.session_state.active_page = "📄 Document Intelligence"
-            st.rerun()
+        st.markdown("""
+            <div class="overview-card">
+                <h3 style="color: #60a5fa; margin-top: 0;">📄 Document Intelligence Suite</h3>
+                <p style="color: #9ca3af; font-size: 0.9rem;">Convert PDF files to Markdown, Word (.docx), or compile images into PDFs. Merge multi-file queues, compress documents, generate word frequency clouds, and extract embedded raster assets.</p>
+            </div>
+        """, unsafe_allow_html=True)
     with col2:
-        st.markdown("### 🖼️ Media Studio")
-        st.markdown("Batch resize image resolutions, reduce file sizes with quality compression, and apply grayscale filters.")
-        if st.button("Open Media Studio ➔", type="primary", use_container_width=True):
-            st.session_state.active_page = "🖼️ Media Studio"
-            st.rerun()
+        st.markdown("""
+            <div class="overview-card">
+                <h3 style="color: #34d399; margin-top: 0;">🖼️ Media & Image Studio</h3>
+                <p style="color: #9ca3af; font-size: 0.9rem;">Batch resize image resolutions, optimize quality compression ratios to reduce file sizes (KB/MB), and apply grayscale pixel conversions effortlessly.</p>
+            </div>
+        """, unsafe_allow_html=True)
+        
+    st.info("👈 Use the **Workspace Directory** in the sidebar to navigate to your desired module.")
 
 # ==================== 1. DOCUMENT INTELLIGENCE PAGE ====================
 elif selected_page == "📄 Document Intelligence":
     st.markdown('<p class="hero-title">📄 Document Intelligence Hub</p>', unsafe_allow_html=True)
     st.markdown('<p class="hero-subtitle">High-speed file conversions, parsing, and pipeline operations.</p>', unsafe_allow_html=True)
     
-    # Clean Tabbed Interface (Replaces messy horizontal radio buttons)
     tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
         "PDF to Markdown", 
         "PDF to Word", 
@@ -174,11 +192,11 @@ elif selected_page == "📄 Document Intelligence":
         if pdf_file and st.button("Generate Word Cloud", type="primary"):
             doc = pymupdf.open(stream=pdf_file.read(), filetype="pdf")
             corpus = " ".join([p.get_text("text") for p in doc])
-            wc = WordCloud(width=800, height=400, background_color="#090d16", colormap="cool").generate(corpus)
+            wc = WordCloud(width=800, height=400, background_color="#0b0f19", colormap="cool").generate(corpus)
             fig, ax = plt.subplots(figsize=(8, 4))
             ax.imshow(wc, interpolation="bilinear")
             ax.axis("off")
-            fig.patch.set_facecolor('#090d16')
+            fig.patch.set_facecolor('#0b0f19')
             st.pyplot(fig)
 
     with tab8:
