@@ -11,7 +11,7 @@ matplotlib
 wordcloud
 python-docx
 
-torch==2.6.0+cpu
+torch==2.9.0+cpu
 transformers>=4.51,<5
 sentencepiece
 indictranstoolkit
